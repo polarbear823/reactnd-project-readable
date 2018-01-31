@@ -30,11 +30,11 @@ export const fetchCategoryPosts = (category) => dispatch => (
         .then (categoryPosts => dispatch(receivePosts(categoryPosts)))
 );
 
-export const postNewPost = (newPost, callback) => dispatch => {
+export const postNewPost = (newPost, sameCategory, callback) => dispatch => {
     ReadableAPIUtil
         .postNewPost(newPost)
         .then(() => callback())
-        dispatch({type: ADD_POST, newPost});
+        dispatch({type: ADD_POST, newPost, sameCategory});
 };
 
 export const editPost = (postId, content, callback) => dispatch => {

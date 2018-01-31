@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { fetchPost, deletePost, votePost } from '../actions/posts_actions';
 import { connect } from 'react-redux';
-import {Card, Icon, List, Button, Form, Input} from 'antd';
+import {Card, Icon, List, Button, Form, Input, Alert} from 'antd';
 import { UPVOTE, DOWNVOTE } from '../util/constance_util';
 import AddPost from './AddPost';
 import CommentCard from "./CommentCard";
@@ -17,7 +17,6 @@ class PostDetail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            vote: 1,
             commentCount: 0,
             isAdd: false,
             isOpen: false,
@@ -35,7 +34,7 @@ class PostDetail extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (nextProps !== this.props) {
-            this.setState({vote: nextProps.post.voteScore, title: nextProps.post.title, body: nextProps.post.body});
+            this.setState({ title: nextProps.post.title, body: nextProps.post.body});
         }
         if (nextProps.commentCount !== this.props.commentCount){
             this.setState({commentCount: nextProps.post.commentCount});
@@ -60,14 +59,6 @@ class PostDetail extends Component {
 
     onVoteClicked = (voteOption) => {
         this.props.dispatch(votePost(this.props.postId, voteOption));
-        if (voteOption === UPVOTE) {
-            //this.props.post.voteScore += 1;
-            this.setState({vote: this.props.post.voteScore + 1});
-        }
-        if (voteOption === DOWNVOTE) {
-            //this.props.post.voteScore -= 1;
-            this.setState({vote: this.props.post.voteScore - 1});
-        }
     }
 
     openOrCloseAddEditPostModal = (isAdd, isOpen, post) => {
@@ -115,6 +106,7 @@ class PostDetail extends Component {
         const { getFieldDecorator, getFieldsError, getFieldError, isFieldTouched } = this.props.form;
         const authorError = isFieldTouched('author') && getFieldError('author');
         const commentBodyError = isFieldTouched('commentBody') && getFieldError('commentBody');
+        if (this.props.post.id !== undefined) {
         return (
             <div>
                 <Card title={this.state.title} 
@@ -123,7 +115,7 @@ class PostDetail extends Component {
                                 <Icon type="edit" onClick={this.onEditButtonClicked}/>, 
                                 <Icon type="delete" onClick={this.onDeleteClicked}/>]}>
                       <p>{this.state.body}</p>
-                      <Card.Meta description={`author: ${this.props.post.author} | comments#: ${this.state.commentCount} | score: ${this.state.vote}`}
+                      <Card.Meta description={`author: ${this.props.post.author} | comments#: ${this.props.post.commentCount} | score: ${this.props.vote}`}
                                  style={{textAlign: "right"}}/>
                 </Card>
                 <AddPost isAdd={this.state.isAdd} post={this.props.post} isOpen={this.state.isOpen} changeAddPostState={this.openOrCloseAddEditPostModal}/>
@@ -167,10 +159,18 @@ class PostDetail extends Component {
                     renderItem={comment => (<CommentCard comment={comment} onDeleteComment={this.onDeleteComment}/>)}
                 />
             </div>
-        )
+        )} else {
+            return (<Alert
+                message="404 Error"
+                description="404 NOT FOUND!."
+                type="error"
+                showIcon
+            />);
+        }
     }
 }
 export default connect(state => ({
     post: state.post,
+    vote: state.post.voteScore,
     comments: state.comments
   }))(Form.create()(PostDetail));

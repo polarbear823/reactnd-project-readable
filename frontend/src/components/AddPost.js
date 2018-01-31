@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select } from 'antd';
 import { connect } from 'react-redux';
 import { postNewPost, editPost } from "../actions/posts_actions";
 import { getGuid } from '../util/guid_utils';
+import { withRouter } from 'react-router';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -46,12 +47,17 @@ class AddPost extends Component {
                     author: values.author,
                     category: values.category
                 }
-                this.props.dispatch(postNewPost(newPost, () => {
+                console.log(this.props.location);
+                const sameCategory = this.props.location.pathname === `/${values.category}` || this.props.location.pathname === "/";
+                this.props.dispatch(postNewPost(newPost, sameCategory, () => {
                     this.setState({
                         isOpen: false,
                         confirmLoading: false
                     });
                     this.props.changeAddPostState(this.state.isAdd, false, null);
+                    if (!sameCategory){
+                        this.props.history.push(`/${values.category}`);
+                    }
                 }));
               } else {
                   const updatedContent = {
@@ -154,7 +160,7 @@ class AddPost extends Component {
         )
     }
 }
-export default connect((state, ownProps) => ({
+export default withRouter(connect((state, ownProps) => ({
     categories: state.categories,
     ...ownProps
-  }))(Form.create()(AddPost));
+  }))(Form.create()(AddPost)));

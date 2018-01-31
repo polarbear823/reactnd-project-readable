@@ -22,8 +22,11 @@ function posts (state = [], action) {
         case GET_POSTS :
           return state
         case ADD_POST :
-          action.newPost.voteScore = 1;
-          return state.concat(action.newPost)
+          if (action.sameCategory) {
+              action.newPost.voteScore = 1;
+              return state.concat(action.newPost);
+          }
+          return state;         
         case EDIT_POST : 
           return state.map(post => {
               if (action.postId === post.id) {
@@ -34,6 +37,18 @@ function posts (state = [], action) {
           })
         case DELETE_POST : 
           return state.filter(post => post.id !== action.postId)
+        case VOTE_POST:
+          return state.map(post => {
+              if (post.id === action.postId) {
+                    if(action.option === UPVOTE) {
+                        post.voteScore += 1;
+                    }
+                    if (action.option === DOWNVOTE) {
+                        post.voteScore -= 1;
+                    }                   
+              }
+              return post;
+          })
         default :
         return state
     }
@@ -44,16 +59,21 @@ function post (state = {}, action) {
         case RECEIVE_POST:
             return action.post
         case VOTE_POST:
-            let updatedPost = state;
             if (action.postId === state.id) {
                 if(action.option === UPVOTE) {
-                    updatedPost.voteScore += 1;
+                    state.voteScore += 1;
                 }
                 if (action.option === DOWNVOTE) {
-                    updatedPost.voteScore -= 1;
+                    state.voteScore -= 1;
                 }
             }
-            return updatedPost   
+            return state
+        case DELETE_COMMENT:
+            state.commentCount -= 1;
+            return state
+        case ADD_COMMENT:
+            state.commentCount += 1;
+            return state
         default:
             return state
     }

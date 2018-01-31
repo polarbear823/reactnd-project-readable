@@ -14,7 +14,6 @@ class PostCard extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rate: props.post.voteScore,
             showGiveRateButton: true,
             isAdd: false,
             isOpen: false
@@ -25,17 +24,20 @@ class PostCard extends Component {
         this.setState({showGiveRateButton: false});
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (nextProps !== this.props) {
+            this.props = nextProps;
+        }
+    }
+
     onRateButtonClicked = (voteOption) => {
         if (voteOption === UPVOTE) {
             this.props.dispatch(votePost(this.props.post.id, UPVOTE));
-            this.setState({rate: this.state.rate + 1, showGiveRateButton: true});
-            this.props.post.voteScore += 1;
         }
         if (voteOption === DOWNVOTE) {
             this.props.dispatch(votePost(this.props.post.id, DOWNVOTE));
-            this.setState({rate: this.state.rate - 1, showGiveRateButton: true});
-            this.props.post.voteScore -= 1;
         }
+        this.setState({showGiveRateButton: true});
     }
 
     getShowHideClass = (show) => show ? SHOW_CLASS : NOT_SHOW_CLASS;
@@ -80,4 +82,4 @@ class PostCard extends Component {
         )
     }
 }
-export default connect((state, ownProps) => ({...ownProps}))(PostCard);
+export default connect((state, ownProps) => ({posts: state.posts, ...ownProps}))(PostCard);
