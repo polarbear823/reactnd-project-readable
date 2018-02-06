@@ -28,8 +28,9 @@ const Nav = (props) => (
           title={<span><Icon type="profile" /><span>Categories</span></span>}
         >
           {props.categories.map(category => {
+            const { name, path } = category;
             return(
-            <Menu.Item key={category.name}><Link to={`/${category.path}`}>{category.name}</Link></Menu.Item>
+            <Menu.Item key={name}><Link to={`/${path}`}>{name}</Link></Menu.Item>
           )})}
         </SubMenu>
       </Menu>

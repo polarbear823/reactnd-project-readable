@@ -27,11 +27,21 @@ class CommentCard extends Component {
     onRateButtonClicked = (voteOption) => {
         if (voteOption === UPVOTE) {
             this.props.dispatch(voteComment(this.props.comment.id, UPVOTE));
-            this.setState({rate: this.state.rate + 1, showGiveRateButton: true});
+            this.setState((prevState) => {
+                return {
+                    rate: prevState.rate + 1,
+                    showGiveRateButton: true
+                }
+            });
         }
         if (voteOption === DOWNVOTE) {
             this.props.dispatch(voteComment(this.props.comment.id, DOWNVOTE));
-            this.setState({rate: this.state.rate - 1, showGiveRateButton: true});
+            this.setState((prevState) => {
+                return {
+                    rate: prevState.rate - 1,
+                    showGiveRateButton: true
+                }
+            });
         }
     }
 
@@ -41,12 +51,6 @@ class CommentCard extends Component {
         this.setState({
             confirmLoading: true
         });
-        // setTimeout(() => {
-        //     this.setState({
-        //         visible: false,
-        //         confirmLoading: false,
-        //     });
-        // }, 2000);
         const updatedComment = {
             body: this.state.commentBody,
             timestamp: Date.now()

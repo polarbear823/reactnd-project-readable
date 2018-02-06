@@ -10,8 +10,8 @@ const Option = Select.Option;
 
 class AddPost extends Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
             isOpen: false,
             confirmLoading: false,
@@ -21,13 +21,21 @@ class AddPost extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({
-            isOpen: nextProps.isOpen,
-            post: nextProps.post,
-            isAdd: nextProps.isAdd
-        });
         if (nextProps.isOpen !== this.state.isOpen) {
             this.props.form.resetFields();
+            this.setState({
+                isOpen: nextProps.isOpen
+            });
+        }
+        if (nextProps.post !== this.state.post) {
+            this.setState({
+                post: nextProps.post
+            });
+        }
+        if (nextProps.isAdd !== this.state.isAdd) {
+            this.setState({
+                isAdd: nextProps.isAdd
+            });
         }
     }
 
@@ -37,17 +45,16 @@ class AddPost extends Component {
         });
         this.props.form.validateFields((err, values) => {
             if (!err) {
-              console.log('Received values of form: ', values);
+              const {title, body, author, category} = values;
               if (this.state.isAdd) {
                 const newPost = {
                     id: getGuid(),
                     timestamp: Date.now(),
-                    title: values.title,
-                    body: values.body,
-                    author: values.author,
-                    category: values.category
+                    title,
+                    body,
+                    author,
+                    category
                 }
-                console.log(this.props.location);
                 const sameCategory = this.props.location.pathname === `/${values.category}` || this.props.location.pathname === "/";
                 this.props.dispatch(postNewPost(newPost, sameCategory, () => {
                     this.setState({
@@ -65,7 +72,7 @@ class AddPost extends Component {
                       body: values.body
                   };
                   const postId = this.state.post.id;
-                  let updatedPost = this.state.post;
+                  const updatedPost = this.state.post;
                   updatedPost.title = values.title;
                   updatedPost.body = values.body;
                   this.props.dispatch(editPost(postId, updatedContent, () => {
